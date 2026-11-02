@@ -12,6 +12,9 @@ public class CofreController : MonoBehaviour
     [Header("Controlador de Puertas")]
     public PuertasController puertasController; // <--- NUEVA REFERENCIA
 
+    [Header("Efectos de Sonido")]
+    public AudioSource sonidoAbrir;
+
     private bool estaCerca = false;
     private bool estaAbierto = false;
     private bool objetoRecogido = false;
@@ -47,7 +50,11 @@ public class CofreController : MonoBehaviour
         {
             objetoDentro.SetActive(true);
         }
-
+        // <-- REPRODUCIR EL SONIDO AQUÍ
+        if (sonidoAbrir != null)
+        {
+            sonidoAbrir.Play();
+        }
         Debug.Log("¡Cofre abierto!");
     }
 

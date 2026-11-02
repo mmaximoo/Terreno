@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;           //Para usar temporizador
 
 public class PuertasController : MonoBehaviour
 {
@@ -14,6 +15,12 @@ public class PuertasController : MonoBehaviour
     [Header("Progreso")]
     public int objetosNecesarios = 3;
     private int objetosRecogidos = 0;
+
+    [Header("Eventos Especiales")]
+    public AparecerPersonaje ModeloFantasma; 
+
+    [Header("Efectos de Sonido")]
+    public AudioSource[] sonidosAbrir;
 
     private bool abriendo = false;
     private Quaternion destinoPuerta1;
@@ -49,6 +56,26 @@ public class PuertasController : MonoBehaviour
         {
             abriendo = true;
             Debug.Log("¡Se han recogido los 3 objetos! Abriendo puertas...");
+
+            foreach (AudioSource sonido in sonidosAbrir)
+            {
+                if (sonido != null)
+                {
+                    sonido.Play();
+                }
+            }
+            //Iniciar el contador
+            if (ModeloFantasma != null)
+            {
+                StartCoroutine(EsperarYAparecer());
+            }
         }
+    }
+    // Función del temporizador que cuenta 5 segundos
+    private IEnumerator EsperarYAparecer()
+    {
+        yield return new WaitForSeconds(5f); 
+        ModeloFantasma.HacerVisible();       
+        //Debug.Log("¡Pasaron 5 segundos y el fantasma apareció!");
     }
 }
