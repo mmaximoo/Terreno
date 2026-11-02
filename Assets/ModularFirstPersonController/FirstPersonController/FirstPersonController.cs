@@ -371,7 +371,7 @@ public class FirstPersonController : MonoBehaviour
 
         #region Crouch
 
-        if (enableCrouch)
+        /*if (enableCrouch)
         {
             if(Input.GetKeyDown(crouchKey) && !holdToCrouch)
             {
@@ -384,6 +384,35 @@ public class FirstPersonController : MonoBehaviour
                 Crouch();
             }
             else if(Input.GetKeyUp(crouchKey) && holdToCrouch)
+            {
+                isCrouched = true;
+                Crouch();
+            }
+        }*/
+        bool crouchDown = false;
+        bool crouchUp = false;
+
+        if (!esJugador2) {
+            crouchDown = Input.GetKeyDown(crouchKey);
+            crouchUp = Input.GetKeyUp(crouchKey);
+        } else if (Gamepad.current != null) {
+            crouchDown = Gamepad.current.buttonEast.wasPressedThisFrame; // Botón B o Círculo
+            crouchUp = Gamepad.current.buttonEast.wasReleasedThisFrame;
+        }
+
+        if (enableCrouch)
+        {
+            if(crouchDown && !holdToCrouch)
+            {
+                Crouch();
+            }
+            
+            if(crouchDown && holdToCrouch)
+            {
+                isCrouched = false;
+                Crouch();
+            }
+            else if(crouchUp && holdToCrouch)
             {
                 isCrouched = true;
                 Crouch();
@@ -437,7 +466,16 @@ public class FirstPersonController : MonoBehaviour
             }
 
             // All movement calculations shile sprint is active
-            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
+            //if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
+            bool sprintHeld = false;
+            if (!esJugador2) {
+                sprintHeld = Input.GetKey(sprintKey);
+            } else if (esJugador2 && Gamepad.current != null) {
+                sprintHeld = Gamepad.current.leftTrigger.isPressed; // Gatillo Izquierdo (LT/L2)
+            }
+
+            // All movement calculations shile sprint is active
+            if (enableSprint && sprintHeld && sprintRemaining > 0f && !isSprintCooldown)
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
 
