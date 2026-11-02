@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem; // NUEVO
 
 #if UNITY_EDITOR
     using UnityEditor;
@@ -58,6 +59,7 @@ public class FirstPersonController : MonoBehaviour
     public bool playerCanMove = true;
     public float walkSpeed = 5f;
     public float maxVelocityChange = 10f;
+    public bool esJugador2 = false; 
 
     // Internal Variables
     private bool isWalking = false;
@@ -207,6 +209,7 @@ public class FirstPersonController : MonoBehaviour
         // Control camera movement
         if(cameraCanMove)
         {
+            /*
             yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
 
             if (!invertCamera)
@@ -218,7 +221,28 @@ public class FirstPersonController : MonoBehaviour
                 // Inverted Y
                 pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
             }
+            */
+            float lookX = 0f;
+            float lookY = 0f;
 
+            if (!esJugador2) {
+                lookX = Input.GetAxis("Mouse X");
+                lookY = Input.GetAxis("Mouse Y");
+            } else if (Gamepad.current != null) {
+                lookX = Gamepad.current.rightStick.x.ReadValue();
+                lookY = Gamepad.current.rightStick.y.ReadValue();
+            }
+
+            yaw = transform.localEulerAngles.y + lookX * mouseSensitivity;
+
+            if (!invertCamera)
+            {
+                pitch -= mouseSensitivity * lookY;
+            }
+            else
+            {
+                pitch += mouseSensitivity * lookY;
+            }
             // Clamp pitch between lookAngle
             pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
 
@@ -326,11 +350,23 @@ public class FirstPersonController : MonoBehaviour
         #region Jump
 
         // Gets input and calls jump method
+        /*
         if(enableJump && Input.GetKeyDown(jumpKey) && isGrounded)
         {
             Jump();
         }
+        */
+        bool jumpPressed = false;
+        if (!esJugador2) {
+            jumpPressed = Input.GetKeyDown(jumpKey);
+        } else if (Gamepad.current != null) {
+            jumpPressed = Gamepad.current.buttonSouth.wasPressedThisFrame; // Botón A en Xbox / X en PS
+        }
 
+        if(enableJump && jumpPressed && isGrounded)
+        {
+            Jump();
+        }
         #endregion
 
         #region Crouch
@@ -371,7 +407,23 @@ public class FirstPersonController : MonoBehaviour
         if (playerCanMove)
         {
             // Calculate how fast we should be moving
+            /*
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            */
+            float moveX = 0f;
+            float moveZ = 0f;
+
+            if (!esJugador2 && Keyboard.current != null) {
+                if (Keyboard.current.dKey.isPressed) moveX += 1f;
+                if (Keyboard.current.aKey.isPressed) moveX -= 1f;
+                if (Keyboard.current.wKey.isPressed) moveZ += 1f;
+                if (Keyboard.current.sKey.isPressed) moveZ -= 1f;
+            } else if (esJugador2 && Gamepad.current != null) {
+                moveX = Gamepad.current.leftStick.x.ReadValue();
+                moveZ = Gamepad.current.leftStick.y.ReadValue();
+            }
+
+            Vector3 targetVelocity = new Vector3(moveX, 0, moveZ);
 
             // Checks if player is walking and isGrounded
             // Will allow head bob
@@ -616,6 +668,7 @@ public class FirstPersonController : MonoBehaviour
 
         fpc.playerCanMove = EditorGUILayout.ToggleLeft(new GUIContent("Enable Player Movement", "Determines if the player is allowed to move."), fpc.playerCanMove);
 
+        fpc.esJugador2 = EditorGUILayout.ToggleLeft(new GUIContent("Usar Mando (Jugador 2)", "Activa esto para controlar con mando de consola."), fpc.esJugador2);
         GUI.enabled = fpc.playerCanMove;
         fpc.walkSpeed = EditorGUILayout.Slider(new GUIContent("Walk Speed", "Determines how fast the player will move while walking."), fpc.walkSpeed, .1f, fpc.sprintSpeed);
         GUI.enabled = true;
