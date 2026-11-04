@@ -209,19 +209,6 @@ public class FirstPersonController : MonoBehaviour
         // Control camera movement
         if(cameraCanMove)
         {
-            /*
-            yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
-
-            if (!invertCamera)
-            {
-                pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
-            else
-            {
-                // Inverted Y
-                pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
-            */
             float lookX = 0f;
             float lookY = 0f;
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CofreController : MonoBehaviour
 {
@@ -30,7 +31,20 @@ public class CofreController : MonoBehaviour
     {
         if (!estaCerca) return;
 
-        if (!estaAbierto && Input.GetKeyDown(KeyCode.E))
+        // 1. Detectar la tecla E (Teclado)
+        bool pulsadoTeclado = Input.GetKeyDown(KeyCode.E);
+        bool pulsadoMando = false;
+        
+        if (Gamepad.current != null)
+        {
+            // buttonNorth corresponde a Triángulo en PS / Y en Xbox
+            pulsadoMando = Gamepad.current.buttonNorth.wasPressedThisFrame; 
+        }
+
+        // 3. Si se presiona cualquiera de los dos, interactuamos
+        bool botonInteraccion = pulsadoTeclado || pulsadoMando;
+        
+        if (!estaAbierto && botonInteraccion)
         {
             AbrirCofre();
         }
